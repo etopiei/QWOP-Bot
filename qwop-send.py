@@ -10,7 +10,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         #got message from js
-        print(message)
+        deal_with_message(message)
 
     def on_close(self):
         print("Client disconnect.")
@@ -18,6 +18,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         # Allow cross-origin WebSocket connections
         return True
+
+def deal_with_message(msg):
+    #extract data from message
+    print(msg)
 
 if __name__ == "__main__":
 
