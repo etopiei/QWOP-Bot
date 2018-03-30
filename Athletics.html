@@ -1,0 +1,98 @@
+<html>
+
+<div id="gameContent">
+    <div id="window1">
+
+    </div>
+</div>
+
+<script type="text/javascript" src="./lib/howler.js"></script>
+<!-- <script type="text/javascript" src="./scripts/swfobject.js"></script> -->
+<script type="text/javascript">
+
+    var refreshIntervalId;
+    var windowWidth;
+    
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+    
+    
+    window.onload = function(){
+        
+        var playerVersion = 0;
+        var container = document.getElementById('gameContent');
+        //this is the rubbish we have to deal with to make stuff work on mobile browsers, ugh. I hate you.
+        if (document.addEventListener){
+              document.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, false);
+    
+            if ((playerVersion.major > 9)&&(!webgl)){}
+            else {
+                  document.documentElement.addEventListener('keydown', function (e) {
+                    if ( ( e.keycode || e.which ) == 32) {
+                        e.preventDefault();
+                    }
+                }, false);
+             }
+            
+        } 
+        else if (document.attachEvent){
+            document.attachEvent('touchmove', function(e) {
+                e.preventDefault();
+            }, false);
+            if ((playerVersion.major > 9)&&(!webgl)){}
+            else {
+                document.attachEvent('keydown', function (e) {
+                    if ( ( e.keycode || e.which ) == 32) {
+                        e.preventDefault();
+                    }
+                }, false);
+            }
+        }
+    
+        var updateLayout = function() {
+            var viewport = document.querySelector("meta[name=viewport]");
+    
+            if (windowWidth != window.screen.width){
+                var initialScale = Math.min(window.innerWidth/800.0,window.innerHeight/640.0)	
+                if( /Android|webOS|BlackBerry|IEMobile|Opera Mini|Silk/i.test(navigator.userAgent) ) {	
+                    viewport.setAttribute('content', "width=640, height=480, maximum-scale=1.5, minimum-scale=0.25, user-scalable=no, initial-scale="+initialScale);
+                }
+                else if( /iPhone|iPod/i.test(navigator.userAgent) ) {	
+                    viewport.setAttribute('content', "width=640, height=480, maximum-scale=1.0, minimum-scale=0.25, user-scalable=no, initial-scale="+initialScale);
+                }
+                else if( /iPad/i.test(navigator.userAgent) ) {
+                    viewport.setAttribute('content', "width=640, height=480, maximum-scale=1.0, minimum-scale=0.25, user-scalable=no, initial-scale="+initialScale);
+                }
+                window.scrollTo(0,0);
+                windowWidth = window.screen.width;
+            }
+        }
+        setInterval(updateLayout, 400);
+        var webgl = getParameterByName("webgl");
+        if ((playerVersion.major >= 9)&&(!webgl))
+        {
+            swfobject.embedSWF(
+                "athletics.swf", "gameContent",
+                "640", "400", "9.0.24"
+                );
+        }
+        else
+        {
+            var gamejs = document.createElement('script');
+            gamejs.type = 'text/javascript';
+               gamejs.src = "./QWOP2.min.js";
+            container.appendChild(gamejs);
+        }
+            
+    };	
+    
+    
+    </script>
+
+    <script src="ws.js"></script>
+
+</html>
