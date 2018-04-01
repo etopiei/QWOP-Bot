@@ -14,4 +14,4 @@ def mutateChildren(child):
     #pick 1/5th of inputs and randomly change them
 
 def getFitnessOfSpecies(species):
-    fitness = species[1]/species[2] - 10
+    fitness = species[1]

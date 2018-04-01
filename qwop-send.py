@@ -35,7 +35,7 @@ def deal_with_message(msg):
 
 if __name__ == "__main__":
 
-    inputOptions = ["q", "w", "o", "p"]
+    inputOptions = ["q", "w", "o", "p", ""]
     generationNumber = 0
     speciesNumber = 0
 

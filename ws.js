@@ -20,7 +20,9 @@ function qwopLoaded() {
     }
     ws.onmessage = function (event) {
         console.log(event.data)
-        if(event.data != "q" && event.data != "w" && event.data != "o" && event.data != "p" && event.data != " ") {
+        if(event.data == ""){
+            //don't hit any keys this frame.
+        } else if(event.data != "q" && event.data != "w" && event.data != "o" && event.data != "p" && event.data != " ") {
             // click QWOP to begin game
             var element = document.getElementsByTagName('canvas')[0];
             dispatchMouseEvent(element, 'mouseover', true, true);
@@ -29,23 +31,19 @@ function qwopLoaded() {
             dispatchMouseEvent(element, 'mouseup', true, true);
 
             //display info about generation
-            let infoText = document.createElement('p');
+            let infoText = document.getElementById('generation-text');
             let parts = event.data.split(',');
             generation = parseInt(parts[0]);
             species = parseInt(parts[1]);
             infoText.innerText = createText();
-            infoText.style.position = "absolute";
-            infoText.style.top = "0";
-            infoText.style.right = "10";
-            var pageBody = document.getElementsByTagName('body')[0];
+            var pageBody = document.getElementById('details');
             pageBody.appendChild(infoText);
-
         } else {
             let code = getCode(event.data)
             if(event.data == " ") {
                 //restarting game because died
                 species += 1;
-                var infoText = document.getElementsByTagName('p')[0];
+                var infoText = document.getElementById('generation-text');
                 infoText.innerText = createText();
                 simulateKeydown(code);
                 simulateKeyup(code);
@@ -96,6 +94,16 @@ function sendGameStats(data) {
 
 function sendEndGameStats(score, time) {
     ws.send(score.toString() + ", " + time.toString())
+    //also add this data to a table under the details at the top
+    let table = document.getElementsByTagName('table')[0];
+    let newRow = document.createElement('tr');
+    let newData1 = document.createElement('td');
+    let newData2 = document.createElement('td');
+    newData1.innerText = species.toString();
+    newData2.innerText = score.toString();
+    newRow.appendChild(newData1);
+    newRow.appendChild(newData2);
+    table.appendChild(newRow);
 }
 
 var dispatchMouseEvent = function(target, var_args) {
