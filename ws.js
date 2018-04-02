@@ -93,7 +93,7 @@ function sendGameStats(data) {
 }
 
 function sendEndGameStats(score, time) {
-    ws.send(score.toString() + ", " + time.toString())
+    ws.send(score.toString() + "," + time.toString())
     //also add this data to a table under the details at the top
     let table = document.getElementsByTagName('table')[0];
     let newRow = document.createElement('tr');
