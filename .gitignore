@@ -2,3 +2,8 @@
 qwop2.min.js
 lib/*
 assets/*
+__pycache__/*
+data.txt
+firstData.txt
+population.txt
+template-data.txt

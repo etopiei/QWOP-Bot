@@ -23,7 +23,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         return True
 
 def checkNewGenAndUpdate():
-    global speciesNumber
+    global speciesNumber, population
     if (speciesNumber+1)%64 == 0:
         #need to generate a new generation
         population = gen.createNewPopulation(outData)
@@ -34,33 +34,41 @@ def checkNewGenAndUpdate():
         #update species number
         speciesNumber += 1
 
-def nextAction(step):
-    if len(population) >= speciesNumber:
+def nextAction(step, population):
+    if len(population) >= speciesNumber and len(population) > 0:
         #get the action from the population data
-        return population[[speciesNumber][0][step%len(population[speciesNumber][0])]]
+        return str(population[speciesNumber][step%len(population[speciesNumber])])
     else:
         #generate a random action
-        return inputOptions[random.randrange(0, 4)]
+        return str(inputOptions[random.randrange(0, 5)])
 
 def deal_with_message(msg):
+    global step, speciesOut, generationNumber, speciesNumber
     #extract data from message
     if msg != "newData":
         #go to next species and record data from last species
         parts = msg.split(',')
         score = parts[0]
         time = parts[1]
+
+        #log data
+        print(str(generationNumber), "," , str(speciesNumber), "," , score)
+        with open("data.txt", "a") as myFile:
+            myFile.write(str(speciesOut)+"\n")
+
         speciesFinalData = [speciesOut, score, time]
         outData.append(speciesFinalData)
         speciesOut = []
         #reset step
-        global step
         step = 0
         checkNewGenAndUpdate()
+        return " " #start new species going
     else:
         #get next action
-        global step
-        speciesOut.append(nextAction(step))
+        action = nextAction(step, population)
+        speciesOut.append(action)
         step += 1
+        return action
 
 if __name__ == "__main__":
 

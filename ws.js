@@ -7,6 +7,7 @@ let count = 1;
 var keyStates = {}
 var generation = 0
 var species = 0
+var best = -5
 
 window.onkeyup = function(e) { keyStates[e.keyCode] = false; }
 window.onkeydown = function(e) { keyStates[e.keyCode] = true; }
@@ -62,6 +63,9 @@ function qwopLoaded() {
 }
 
 function createText() {
+    if(species > 0) {
+        return "Generation: " + generation.toString() + "\nSpecies: " + species.toString() + "\nBest This Generation: " + best.toString();
+    }
     return "Generation: " + generation.toString() + "\nSpecies: " + species.toString();
 }
 
@@ -82,10 +86,9 @@ function getCode(keyChar) {
 function sendGameStats(data) {
     if(connected) {
         // send stats from update function, this is called every frame so
-        // only send every 10th frame 
-        if(count%10==0) {
-            //convert data to Python NEAT inputs
-            //ws.send(data)
+        // only send every 3rd frame
+        if(count%3==0) {
+            //ask for new data from python
             ws.send("newData")
         }
         count += 1
@@ -95,7 +98,7 @@ function sendGameStats(data) {
 function sendEndGameStats(score, time) {
     ws.send(score.toString() + "," + time.toString())
     //also add this data to a table under the details at the top
-    let table = document.getElementsByTagName('table')[0];
+    let table = document.getElementById('temp-data');
     let newRow = document.createElement('tr');
     let newData1 = document.createElement('td');
     let newData2 = document.createElement('td');
@@ -104,6 +107,24 @@ function sendEndGameStats(score, time) {
     newRow.appendChild(newData1);
     newRow.appendChild(newData2);
     table.appendChild(newRow);
+
+    //check if best and update
+    if(score > best) {
+        best = score;
+    }
+
+    //now check if a new generation is starting
+    if(species == 63) {
+        generation += 1;
+        species = -1;
+        best = -5;
+        //delete table rows
+        var new_tbody = document.createElement('tbody');
+        document.getElementById('temp-data').remove();
+        new_tbody.setAttribute('id', 'temp-data');
+        var main_table = document.getElementsByTagName('table')[0];
+        main_table.appendChild(new_tbody);
+    }
 }
 
 var dispatchMouseEvent = function(target, var_args) {
@@ -126,4 +147,18 @@ function simulateKeyup (keycode,isCtrl,isAlt,isShift){
     Object.defineProperty(e, 'keyCode', {get : function() { return this.keyCodeVal; } });     
     e.keyCodeVal = keycode;
     document.dispatchEvent(e);
+}
+
+//Thanks to John Dettmar from SO.
+//This code can be viewed here: https://stackoverflow.com/questions/3387427/remove-element-by-id
+
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
+    }
 }
