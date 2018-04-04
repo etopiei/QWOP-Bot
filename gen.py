@@ -79,12 +79,11 @@ def breedParents(parent1Index, parent2Index, population):
 
 def mutateChild(child):
     #pick random inputs and change them
-    options = ["q", "w", "o", "p", ""]
     temp = list(child)
 
-    for _ in range(random.randrange(2, len(child)//6)):
+    for _ in range(random.randrange(0, len(child)//6)):
         place = random.randrange(len(child))
-        temp[place] = options[random.randrange(0, 5)]
+        temp[place] = str(random.randrange(0, 16))
 
     return "".join(temp)
 

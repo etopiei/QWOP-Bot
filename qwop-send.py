@@ -8,7 +8,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print("Client Connected")
-        self.write_message(str(generationNumber) + "," + str(speciesNumber))
+        self.write_message("Start Game")
 
     def on_message(self, message):
         #got message from js
@@ -27,6 +27,7 @@ def checkNewGenAndUpdate():
     if (speciesNumber+1)%64 == 0:
         #need to generate a new generation
         population = gen.createNewPopulation(outData)
+        print("New population generated")
         global generationNumber
         generationNumber += 1
         speciesNumber = 0
@@ -36,11 +37,12 @@ def checkNewGenAndUpdate():
 
 def nextAction(step, population):
     if len(population) >= speciesNumber and len(population) > 0:
-        #get the action from the population data
-        return str(population[speciesNumber][step%len(population[speciesNumber])])
-    else:
-        #generate a random action
-        return str(inputOptions[random.randrange(0, 5)])
+        #get the action from the population data if there is data still
+        if step < len(population[speciesNumber]):
+            return str(population[speciesNumber][step%len(population[speciesNumber])])
+            
+    #generate a random action
+    return str(random.randrange(0, 16))
 
 def deal_with_message(msg):
     global step, speciesOut, generationNumber, speciesNumber
@@ -52,7 +54,7 @@ def deal_with_message(msg):
         time = parts[1]
 
         #log data
-        print(str(generationNumber), "," , str(speciesNumber), "," , score)
+        print(str(generationNumber), "," , str(speciesNumber), "," , score, "," , time)
         with open("data.txt", "a") as myFile:
             myFile.write(str(speciesOut)+"\n")
 
@@ -71,8 +73,6 @@ def deal_with_message(msg):
         return action
 
 if __name__ == "__main__":
-
-    inputOptions = ["q", "w", "o", "p", ""]
 
     generationNumber = 0
     speciesNumber = 0

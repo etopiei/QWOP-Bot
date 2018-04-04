@@ -20,10 +20,97 @@ function qwopLoaded() {
         connected = true;
     }
     ws.onmessage = function (event) {
-        console.log(event.data)
-        if(event.data == ""){
-            //don't hit any keys this frame.
-        } else if(event.data != "q" && event.data != "w" && event.data != "o" && event.data != "p" && event.data != " ") {
+        
+        //Code: 
+        //0 = No Input
+        //1 = q down
+        //2 = w down
+        //3 = o down
+        //4 = p down
+        //5 = qw down
+        //6 = qwo down
+        //7 = qwop down
+        //8 = wo down
+        //9 = wop down
+        //10 = op down
+        //11 = qop down
+        //12 = wpq down
+        //13 = wp down
+        //14 = qo down
+        //15 = qp down
+
+        var inputDone = false;
+        var keys = [];
+
+        switch (event.data) {
+            case "0":
+                inputDone = true;
+                break;
+            case "1":
+                keys = ["q"];
+                inputDone = true;
+                break;
+            case "2":
+                keys = ["w"];  
+                inputDone = true;           
+                break;
+            case "3":
+                keys = ["o"]; 
+                inputDone = true;             
+                break;
+            case "4":
+                keys = ["p"];
+                inputDone = true;
+                break;
+            case "5":
+                keys = ["q", "w"];
+                inputDone = true;
+                break;
+            case "6":
+                keys = ["q", "w", "o"];
+                inputDone = true;
+                break;   
+            case "7":
+                keys = ["q", "w", "o", "p"];
+                inputDone = true;
+                break;   
+            case "8":
+                keys = ["w", "o"];
+                inputDone = true;
+                break;
+            case "9":
+                keys = ["w", "o", "p"];
+                inputDone = true;
+                break;
+            case "10":
+                keys = ["o", "p"];
+                inputDone = true;
+                break;
+            case "11":
+                keys = ["o", "p", "q"];
+                inputDone = true;
+                break;
+            case "12":
+                keys = ["w", "p", "q"];
+                inputDone = true;
+                break;
+            case "13":
+                keys = ["w", "p"];
+                inputDone = true;
+                break;
+            case "14":
+                keys = ["q", "o"];
+                inputDone = true;
+                break;
+            case "15":
+                keys = ["q", "p"];
+                inputDone = true;
+                break;
+        }
+
+        pressKeys(keys);
+        
+        if(event.data != " " && !inputDone) {
             // click QWOP to begin game
             var element = document.getElementsByTagName('canvas')[0];
             dispatchMouseEvent(element, 'mouseover', true, true);
@@ -33,31 +120,31 @@ function qwopLoaded() {
 
             //display info about generation
             let infoText = document.getElementById('generation-text');
-            let parts = event.data.split(',');
-            generation = parseInt(parts[0]);
-            species = parseInt(parts[1]);
+            generation = 0;
+            species = 0;
             infoText.innerText = createText();
             var pageBody = document.getElementById('details');
             pageBody.appendChild(infoText);
+
+        } else if(event.data == " ") {
+            //restarting game because died
+            species += 1;
+            var infoText = document.getElementById('generation-text');
+            infoText.innerText = createText();
+            simulateKeydown(getCode(" "));
+            simulateKeyup(getCode(" "));
+        }
+    }
+}
+
+function pressKeys(keys) {
+    checkKeys = ["q", "w", "o", "p"];
+
+    for(var i = 0; i < checkKeys.length; i++) {
+        if(keys.indexOf(checkKeys[i]) > -1) {
+            if(!keyStates[getCode(checkKeys[i])]) { simulateKeydown(getCode(checkKeys[i])) }
         } else {
-            let code = getCode(event.data)
-            if(event.data == " ") {
-                //restarting game because died
-                species += 1;
-                var infoText = document.getElementById('generation-text');
-                infoText.innerText = createText();
-                simulateKeydown(code);
-                simulateKeyup(code);
-            } else {
-                // treat message as key being toggled
-                if(keyStates[code]) {
-                    //key is down, make key-up event
-                    simulateKeyup(code);
-                } else {
-                    //key is up, press it down
-                    simulateKeydown(code);
-                }
-            }
+            if(keyStates[getCode(checkKeys[i])]) { simulateKeyup(getCode(checkKeys[i])) }
         }
     }
 }
@@ -86,8 +173,8 @@ function getCode(keyChar) {
 function sendGameStats(data) {
     if(connected) {
         // send stats from update function, this is called every frame so
-        // only send every 3rd frame
-        if(count%3==0) {
+        // only send every 6th frame
+        if(count%6==0) {
             //ask for new data from python
             ws.send("newData")
         }
@@ -149,7 +236,7 @@ function simulateKeyup (keycode,isCtrl,isAlt,isShift){
     document.dispatchEvent(e);
 }
 
-//Thanks to John Dettmar from SO.
+//Thanks to John Dettmar from Stack Overflow for the functions below.
 //This code can be viewed here: https://stackoverflow.com/questions/3387427/remove-element-by-id
 
 Element.prototype.remove = function() {
