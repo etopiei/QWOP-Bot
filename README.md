@@ -4,7 +4,7 @@ This is a bot to play QWOP, written with web sockets and python.
 
 ## Example
 
-![Example Video]("qwop-example.gif")
+![Example Video](qwop-example.gif)
 
 ## Details
 
@@ -23,9 +23,9 @@ The next step is to edit QWOP(2).min.js to not have restrictions on domain. The 
 
 Next you have to add three functions to the game code to connect to the runner on the page:
 
-    Add a qwopLoaded() method call when the game starts.
-    Add a sendGameStats() method to the update method that fires every frame
-    Add a sendEndGameStats(score, time) call to the end game method.
+1. Add a qwopLoaded() method call when the game starts.
+2. Add a sendGameStats() method to the update method that fires every frame
+3. Add a sendEndGameStats(score, time) call to the end game method.
 
 Now the JS is all set up to run QWOP via websockets. Sp you can host a webserver (using python or PHP) and load the file 'Athletics.html' in your browser.
 
@@ -33,8 +33,10 @@ The final step is setting up the python script which will connect to the browser
 
 To do this:
 
+```bash
 $ pip install tornado
 $ python3 qwop-send.py
+```
 
 Now it should connect to the client in the browser to play QWOP. Update the code in gen.py and qwop-send.py to control how the bot plays.
 
